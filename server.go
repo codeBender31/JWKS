@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"      //To use for cryptography needed for RSA functionality
 	"encoding/base64" //To encode into base64 format
 	"encoding/json"   //To encode and decode JSON objects
+	"fmt"             // Tp format the responses
 	"log"             //To check the logs in the console
 	"math/big"        //For calculations with large ints regarding RSA
 	"net/http"        //To set up HTTP connection
@@ -111,6 +112,8 @@ func authorizationHandler(write http.ResponseWriter, read *http.Request) {
 		//If expired is a parameter set it to past JWT
 		if expired {
 			JWTclaims["exp"] = time.Now().Add(-time.Hour).Unix()
+		} else {
+			JWTclaims["exp"] = time.Now().Add(time.Hour * 1).Unix()
 		}
 
 		//Create a new JWToken
@@ -126,10 +129,16 @@ func authorizationHandler(write http.ResponseWriter, read *http.Request) {
 			//Return after logging in error
 			return
 		}
+
+		//Set the content
+		write.Header().Set("Content-Type", "application/json")
+		//Format the response
+		formattedResponse := fmt.Sprintf(`{"token":"%s"}`, token)
+		write.Write([]byte(formattedResponse))
+		// write.Write([]byte(`{"token":"` + token + `"}`)) //Deliver signed JWT
+	} else {
+		http.Error(write, "No keys left for signing", http.StatusInternalServerError)
 	}
-	//Set the content
-	write.Header().Set("Type", "application/jwt")
-	write.Write([]byte(token)) //Deliver signed JWT
 }
 
 // Create Main function to test all the methods
