@@ -21,6 +21,6 @@ Goland installed newest Version
 ## Note
 The output in my coding environment is not visible in the repo so Im attaching a snippet for reference.
 For some reason the gradebot is not able to check my db file.
-![Testing]()
+![Testing](https://github.com/codeBender31/JWKS/blob/master/DatabaseOutput.PNG)
 # Student Information
 ## Abel Hernandez
