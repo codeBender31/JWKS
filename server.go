@@ -187,7 +187,7 @@ func saveKeysToDB(privateKey *rsa.PrivateKey, expiry time.Time) error {
 func main() {
 	//Declare possible error
 	var err error
-	//Declare new variables
+	//Declare new variables and open file
 	database, err = sql.Open("sqlite3", dataBaseFile)
 
 	//Check for errors

@@ -18,5 +18,9 @@ Goland installed newest Version
 
 ## For Project 2
 ![Testing](https://github.com/codeBender31/JWKS/blob/master/GradeBot2.PNG)
+## Note
+The output in my coding environment is not visible in the repo so Im attaching a snippet for reference.
+For some reason the gradebot is not able to check my db file.
+![Testing]()
 # Student Information
 ## Abel Hernandez
