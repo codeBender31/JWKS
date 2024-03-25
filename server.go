@@ -6,13 +6,14 @@ import (
 	"crypto/rsa"      //To use for cryptography needed for RSA functionality
 	"encoding/base64" //To encode into base64 format
 	"encoding/json"   //To encode and decode JSON objects
-	"fmt"             // Tp format the responses
-	"log"             //To check the logs in the console
-	"math/big"        //For calculations with large ints regarding RSA
-	"net/http"        //To set up HTTP connection
-	"time"            //Needed to be able to time out JWTS kid's
+	"encoding/pem"
+	"fmt"      // Tp format the responses
+	"log"      //To check the logs in the console
+	"math/big" //For calculations with large ints regarding RSA
+	"net/http" //To set up HTTP connection
+	"time"     //Needed to be able to time out JWTS kid's
 
-	//Needed to serialize the keys
+	"crypto/x509" //Needed to serialize the keys
 	//Needed for extra security
 	"github.com/golang-jwt/jwt/v4" //Use repo from github to handle JWTs
 	//Reference https://github.com/golang-jwt/jwt
@@ -39,6 +40,9 @@ const (
 		exp INTEGER NOT NULL
 	)`
 )
+
+// Create global reference to database
+var database *sql.DB
 
 // Create a container to hold keyPairs
 var keyPairs []keyPair
@@ -157,15 +161,40 @@ func authorizationHandler(write http.ResponseWriter, read *http.Request) {
 	}
 }
 
+// Save the keys to the datbase
+func saveKeysToDB(privateKey *rsa.PrivateKey, expiry time.Time) error {
+	//Serialize the keys
+	privateBytes := x509.MarshalPKCS1PrivateKey(privateKey)
+	//Encode the privateKey
+	privePem := pem.EncodeToMemory(&pem.Block{
+		Type: "RSA PRIVATE KEY",
+		//Label proper fields
+		Bytes: privateBytes,
+	})
+	//Set the expiry
+	expiryUnix := expiry.Unix()
+	//Insert into database and log any errors
+	_, err := database.Exec("INSERT INTO keys (key, exp) VALUES (?,?)", privePem, expiryUnix)
+	if err != nil {
+		return err
+	}
+	//return nothing
+	return nil
+
+}
+
 // Create Main function to test all the methods
 func main() {
+	//Declare possible error
+	var err error
 	//Declare new variables
-	database, err := sql.Open("sqlite3", dataBaseFile)
+	database, err = sql.Open("sqlite3", dataBaseFile)
 
 	//Check for errors
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer database.Close()
 
 	//Create the table
 	_, err = database.Exec(createTable)
@@ -175,10 +204,14 @@ func main() {
 		log.Fatalf("Error creating the database table: %s", err)
 	}
 
-	defer database.Close()
 	kid := "uniqueExample"
 	expiry := time.Now().Add(24 * time.Hour)
 	keyPair := generateKeys(kid, 2048, expiry)
+	//Save the keys to the database after creation
+	err = saveKeysToDB(keyPair.privateKey, keyPair.expiryTime)
+	if err != nil {
+		log.Fatalf("Failed to save in database: %s", err)
+	}
 
 	keyPairs = append(keyPairs, keyPair)
 
