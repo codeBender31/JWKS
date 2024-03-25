@@ -12,6 +12,8 @@ import (
 	"net/http"        //To set up HTTP connection
 	"time"            //Needed to be able to time out JWTS kid's
 
+	//Needed to serialize the keys
+	//Needed for extra security
 	"github.com/golang-jwt/jwt/v4" //Use repo from github to handle JWTs
 	//Reference https://github.com/golang-jwt/jwt
 

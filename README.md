@@ -17,6 +17,6 @@ Goland installed newest Version
 ![Testing](https://github.com/codeBender31/JWKS/blob/master/GradeBotCapture.PNG)
 
 ## For Project 2
-![Testing](https://github.com/codeBender31/JWKS/blob/master/GradeBotCapture.PNG)
+![Testing](https://github.com/codeBender31/JWKS/blob/master/GradeBot2.PNG)
 # Student Information
 ## Abel Hernandez
