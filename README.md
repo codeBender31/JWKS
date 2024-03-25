@@ -13,6 +13,10 @@ IDE of your choice
 Goland installed newest Version
 
 ## Grading Screenshot with GradeBot
+## For Project 1
+![Testing](https://github.com/codeBender31/JWKS/blob/master/GradeBotCapture.PNG)
+
+## For Project 2
 ![Testing](https://github.com/codeBender31/JWKS/blob/master/GradeBotCapture.PNG)
 # Student Information
 ## Abel Hernandez
