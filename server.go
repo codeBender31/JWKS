@@ -14,6 +14,10 @@ import (
 
 	"github.com/golang-jwt/jwt/v4" //Use repo from github to handle JWTs
 	//Reference https://github.com/golang-jwt/jwt
+
+	"database/sql" //Import the sqlite database library
+
+	_ "github.com/mattn/go-sqlite3" //Import the driver
 )
 
 // Define struct to hold keys
@@ -23,6 +27,16 @@ type keyPair struct {
 	kid        string
 	expiryTime time.Time
 }
+
+// // Defining the database globally
+const (
+	dataBaseFile = "totally_not_my_privateKeys.db"
+	createTable  = `CREATE TABLE IF NOT EXISTS keys(
+		kid INTEGER PRIMARY KEY AUTOINCREMENT,
+		key BLOB NOT NULL,
+		exp INTEGER NOT NULL
+	)`
+)
 
 // Create a container to hold keyPairs
 var keyPairs []keyPair
@@ -143,6 +157,23 @@ func authorizationHandler(write http.ResponseWriter, read *http.Request) {
 
 // Create Main function to test all the methods
 func main() {
+	//Declare new variables
+	database, err := sql.Open("sqlite3", dataBaseFile)
+
+	//Check for errors
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//Create the table
+	_, err = database.Exec(createTable)
+	//If error is encountered
+	if err != nil {
+		//Output the error and format string
+		log.Fatalf("Error creating the database table: %s", err)
+	}
+
+	defer database.Close()
 	kid := "uniqueExample"
 	expiry := time.Now().Add(24 * time.Hour)
 	keyPair := generateKeys(kid, 2048, expiry)
